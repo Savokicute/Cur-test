@@ -1,0 +1,53 @@
+.hotspot-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  position: sticky;
+  top: calc(var(--header-height) + 16px);
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.hotspot-toolbar-right {
+  margin-left: auto;
+}
+
+.toolbar-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.toolbar-icon-btn:hover,
+.toolbar-icon-btn:focus-visible {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+@media (max-width: 767px) {
+  .hotspot-toolbar {
+    position: static;
+    padding: 10px 12px;
+  }
+
+  .hotspot-toolbar .ant-input-search {
+    width: 100% !important;
+  }
+}

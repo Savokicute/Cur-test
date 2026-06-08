@@ -1,0 +1,118 @@
+# =============================================================
+# 凤凰网 (ifeng.com) 内容提取规则
+# =============================================================
+# 平台标识，必须与 trendRadar/config/config.yaml 中的 platforms.sources[].id 一致
+platform_id: ifeng
+
+# 显示名称，用于日志和界面展示
+display_name: 凤凰网
+
+# 是否启用该规则
+enabled: true
+
+# =============================================================
+# 域名匹配配置
+# =============================================================
+# 用于无 platform_id 时的兜底匹配，填写该平台文章落地页的实际域名
+hosts:
+  - ifeng.com
+  - news.ifeng.com
+  - tech.ifeng.com
+  - finance.ifeng.com
+
+# =============================================================
+# 爬虫阶段配置 (crawl4ai)
+# =============================================================
+crawl:
+  # 【关键】正文容器的 CSS 选择器 - 完全禁用
+  # 说明：让crawl4ai的智能正文识别起作用
+  primary_target: null
+
+  # 同 primary_target，兼容旧写法
+  css_selector: null
+
+  # 内容过滤方式
+  # 可选值：none（不使用BM25/Pruning）、bm25（按热榜标题语义过滤）、pruning（密度剪枝）
+  # 推荐：使用 none 保留完整正文
+  content_filter: none
+
+  # 是否优先使用 raw markdown 而不是重新转换
+  # 说明：false，让crawl4ai用fit_markdown，智能正文识别
+  prefer_raw_markdown: false
+
+  # 是否启用目标元素限制
+  # true：仅提取 primary_target 指定的元素；false：使用全局正文识别
+  use_target_elements: false
+
+  # 获取 HTML 前的延迟时间（秒）
+  # 说明：给页面加载留出时间，确保动态内容渲染完成
+  delay_before_return_html: 2.0
+
+  # 等待页面加载完成的条件
+  # 可选值：domcontentloaded（DOM加载完成）、load（所有资源加载完成）、networkidle（网络空闲）
+  wait_until: load
+
+  # 【关键】额外排除的元素选择器 - 仅排除最明显的干扰
+  # 说明：只排除header,footer,nav,aside，其他让crawl4ai自己判断
+  excluded_selector_extra: >-
+    header,footer,nav,aside
+
+# =============================================================
+# Markdown 后处理配置
+# =============================================================
+markdown_post:
+  # 是否规范化 Markdown 格式（标题、段落、列表、图片等）
+  normalize_markdown: true
+
+  # 是否在文首添加热榜摘要信息
+  prepend_hot_summary: true
+
+  # 【关键】导航标签列表
+  # 说明：行内容匹配这些词时会被当作导航项删除（纯文本或带项目符号）
+  nav_labels:
+    - 要闻
+    - 深度
+    - 直播
+    - 视频
+    - 时事
+    - 更多
+    - 凤凰
+    - 首页
+    - 关注
+    - 订阅
+    - 收藏
+    - 互动
+    - 推广
+    - 下载
+    - APP
+    - 客户端
+    - 二维码
+
+  # 【关键】行删除模式列表
+  # 说明：行内容包含这些字符串时会被删除（正则 OR 匹配）
+  drop_line_patterns:
+    - "增值电信业务"
+    - "ICP备"
+    - "网安备"
+    - "查看更多"
+    - "扫码下载"
+    - "下载APP"
+    - "打开APP"
+    - "客户端"
+    - "二维码"
+    - "扫一扫"
+    - "官方微信"
+    - "官方微博"
+    - "上一篇"
+    - "下一篇"
+    - "返回首页"
+    - "相关阅读"
+    - "推荐阅读"
+    - "责任编辑"
+    - "图片编辑"
+    - "校对"
+    - "未经授权不得转载"
+    - "精品有声"
+    - "好书精选"
+    - "凤凰无线"
+    - "凰家尚品"

@@ -1,0 +1,62 @@
+.view-mode-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background-color: var(--color-surface, #ffffff);
+  border-radius: 6px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.view-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--color-text-muted, #64748b);
+  cursor: pointer;
+  transition: all var(--motion-base, 200ms) var(--motion-easing, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.view-mode-btn:hover:not(:disabled) {
+  background-color: var(--color-background-hover, #f1f5f9);
+  color: var(--color-text-secondary, #475569);
+}
+
+.view-mode-btn:focus-visible {
+  outline: 2px solid var(--color-primary, #1e40af);
+  outline-offset: 2px;
+}
+
+.view-mode-btn.active {
+  background-color: var(--color-primary-bg, #eff6ff);
+  color: var(--color-primary, #1e40af);
+  box-shadow: 0 1px 3px rgba(30, 64, 175, 0.15);
+}
+
+.view-mode-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 暗色主题适配 */
+[data-theme="dark"] .view-mode-switcher {
+  background-color: var(--color-dark-surface, #1e293b);
+  border-color: var(--color-dark-border, #334155);
+}
+
+[data-theme="dark"] .view-mode-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-dark-text-secondary, #cbd5e1);
+}
+
+[data-theme="dark"] .view-mode-btn.active {
+  background-color: rgba(30, 64, 175, 0.25);
+  color: var(--color-secondary, #3b82f6);
+}

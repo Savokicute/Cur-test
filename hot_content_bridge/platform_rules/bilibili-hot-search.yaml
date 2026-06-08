@@ -1,0 +1,26 @@
+platform_id: bilibili-hot-search
+display_name: bilibili 热搜
+enabled: true
+
+hosts:
+  - bilibili.com
+  - www.bilibili.com
+
+crawl:
+  css_selector: "#article-content, .article-content, article"
+  target_elements:
+    - "#article-content"
+    - ".article-content"
+    - "article"
+  use_target_elements: true
+  excluded_selector_extra: >-
+    [class*='header'],[class*='nav'],[class*='footer'],[class*='sidebar'],
+    [class*='comment'],[class*='recommend']
+
+markdown_post:
+  nav_labels:
+    - 首页
+    - 番剧
+    - 直播
+  drop_line_patterns:
+    - "bilibili"

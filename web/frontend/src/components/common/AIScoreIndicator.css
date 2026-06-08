@@ -1,0 +1,150 @@
+.ai-score-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.02);
+  transition: all var(--motion-base, 200ms) var(--motion-easing, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.ai-score-indicator:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* ========== 图标样式 ========== */
+.ai-score-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+/* ========== 文字样式 ========== */
+.ai-score-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  white-space: nowrap;
+}
+
+.ai-score-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ai-score-unit {
+  font-size: 0.85em;
+  color: var(--color-text-muted, #64748b);
+}
+
+/* ========== 进度条样式 ========== */
+.ai-score-progress {
+  width: 48px;
+  margin: 0 !important;
+}
+
+.ai-score-progress .ant-progress-inner {
+  border-radius: 3px;
+}
+
+.ai-score-progress .ant-progress-bg {
+  border-radius: 3px !important;
+  transition: width var(--motion-slow, 300ms) var(--motion-easing, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+/* ========== 分数等级样式 ========== */
+
+/* 高相关性 - 绿色系 */
+.ai-score-high {
+  /* 默认背景 */
+}
+
+.ai-score-high .ai-score-icon {
+  animation: ai-pulse-subtle 2s ease-in-out infinite;
+}
+
+/* 中等相关 - 黄色系 */
+.ai-score-medium .ai-score-icon {
+  /* 使用 config.bgColor */
+}
+
+/* 低度相关 - 灰色系 */
+.ai-score-low .ai-score-text {
+  opacity: 0.7;
+}
+
+/* 无评分状态 */
+.ai-score-none {
+  opacity: 0.5;
+}
+
+.ai-score-none .ai-score-value::before {
+  content: '--';
+}
+
+/* ========== 特殊组件：高相关性徽章 ========== */
+.ai-high-relevance-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  font-size: 11px;
+  font-weight: 500;
+  animation: badge-glow 2s ease-in-out infinite;
+}
+
+@keyframes ai-pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+@keyframes badge-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  }
+}
+
+/* ========== 暗色主题适配 ========== */
+[data-theme="dark"] .ai-score-indicator {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] .ai-score-indicator:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .ai-score-progress .ant-progress-bg {
+  filter: brightness(1.2);
+}
+
+[data-theme="dark"] .ai-score-unit {
+  color: var(--color-dark-text-secondary, #94a3b8);
+}
+
+[data-theme="dark"] .ai-high-relevance-badge {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+}
+
+/* ========== 动画减少偏好 ========== */
+@media (prefers-reduced-motion: reduce) {
+  .ai-score-icon,
+  .ai-high-relevance-badge {
+    animation: none !important;
+  }
+
+  .ai-score-progress .ant-progress-bg {
+    transition: none !important;
+  }
+}

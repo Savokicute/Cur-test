@@ -1,0 +1,51 @@
+# Hot content bridge — paths and article crawl tuning
+
+# 后台调度：项目启动后周期性拉取热榜并触发正文爬取（推荐用 scripts/start_platform.py）
+pipeline_daemon:
+  enabled: true
+  run_on_startup: true          # 启动后立即执行一轮（热榜 + 正文）
+  hotlist_interval_minutes: 30   # daemon 轮询间隔（分钟）— 仅触发，实际执行由 timeline.yaml 控制
+  initial_delay_seconds: 5      # 首次执行前等待（秒）
+  full_trendradar_sync: false   # false=仅热榜入库(推荐); true=完整 trendradar(受 schedule 影响可能跳过采集)
+  crawl_after_hotlist: true       # 热榜完成后自动正文爬取
+  crawl_limit_per_run: 0          # 每轮正文上限，0=不限制
+
+trendradar:
+  root: "trendRadar"
+  # 相对于 root（trendRadar 项目目录）
+  config_yaml: "config/config.yaml"
+
+article_crawl:
+  max_urls_per_run: 0   # 0 = 不截断，爬取最新热榜批次中的全部 URL
+  concurrency: 2
+  per_domain_min_delay_s: 1.5
+  per_domain_max_delay_s: 3.5
+  request_timeout_ms: 60000
+  max_retries: 2
+  top_rank_only: 0
+  skip_domains: []
+  user_agent: ""
+  crawl_config_hash: "v5-cls-brief-fallback"
+
+  # 正文提取：bm25=按热榜标题语义选段（推荐）；pruning=密度剪枝
+  content_filter: "bm25"
+  bm25_threshold: 0.48
+  bm25_use_stemming: false
+  bm25_language: "english"
+  pruning_threshold: 0.52
+
+  word_count_threshold: 12
+  delay_before_return_html: 0.35
+  wait_until: "domcontentloaded"
+
+  remove_forms: true
+  exclude_external_links: true
+  exclude_social_media_links: true
+  exclude_external_images: false
+  markdown_ignore_links: true
+  post_strip_boilerplate: true
+
+  # 仅当页面确有 article/main 等容器时启用；无匹配会导致正文为空
+  use_target_elements: false
+
+  recrawl_success: true

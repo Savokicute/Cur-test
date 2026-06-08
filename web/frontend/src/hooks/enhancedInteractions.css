@@ -1,0 +1,112 @@
+/* ========== 搜索高亮样式 ========== */
+.highlight-text {
+  background-color: rgba(245, 158, 11, 0.25);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+/* 暗色主题下的高亮样式 */
+[data-theme="dark"] .highlight-text {
+  background-color: rgba(245, 158, 11, 0.35);
+}
+
+/* ========== 搜索历史下拉菜单样式 ========== */
+.search-history-dropdown {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.search-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color var(--motion-fast, 150ms) ease;
+}
+
+.search-history-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .search-history-item:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.search-history-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.search-history-delete {
+  opacity: 0;
+  transition: opacity var(--motion-fast, 150ms) ease;
+  padding: 2px;
+  margin-left: 8px;
+  color: var(--color-text-muted, #64748b);
+}
+
+.search-history-item:hover .search-history-delete {
+  opacity: 1;
+}
+
+.search-history-delete:hover {
+  color: var(--color-error, #ef4444);
+}
+
+/* ========== 复制反馈动画 ========== */
+.copy-feedback-icon {
+  animation: copy-success 0.4s ease-out;
+}
+
+@keyframes copy-success {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* ========== 搜索输入框增强样式 ========== */
+.enhanced-search-input:focus {
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12);
+}
+
+.enhanced-search-input .ant-input-prefix {
+  color: var(--color-text-muted, #64748b);
+  transition: color var(--motion-fast, 150ms) ease;
+}
+
+.enhanced-search-input:focus-within .ant-input-prefix {
+  color: var(--color-primary, #1e40af);
+}
+
+/* ========== 快捷键提示标签 ========== */
+.shortcut-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  line-height: 1;
+  color: var(--color-text-muted, #64748b);
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .shortcut-hint {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--color-dark-text-secondary, #94a3b8);
+}

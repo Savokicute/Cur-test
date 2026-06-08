@@ -1,0 +1,25 @@
+platform_id: toutiao
+display_name: 今日头条
+enabled: true
+
+hosts:
+  - toutiao.com
+  - www.toutiao.com
+
+crawl:
+  css_selector: "article, .article-content, .syl-article-base"
+  target_elements:
+    - "article"
+    - ".article-content"
+    - ".syl-article-base"
+  use_target_elements: true
+  excluded_selector_extra: >-
+    [class*='header'],[class*='footer'],[class*='sidebar'],[class*='comment'],
+    [class*='related'],[class*='download'],[id*='comment']
+
+markdown_post:
+  nav_labels:
+    - 推荐
+    - 热点
+  drop_line_patterns:
+    - "今日头条"

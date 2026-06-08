@@ -1,0 +1,27 @@
+platform_id: zhihu
+display_name: 知乎
+enabled: true
+
+hosts:
+  - zhihu.com
+  - www.zhihu.com
+
+crawl:
+  css_selector: ".Post-RichText, .RichContent, article"
+  target_elements:
+    - ".Post-RichText"
+    - ".RichContent"
+    - "article"
+  use_target_elements: true
+  excluded_selector_extra: >-
+    [class*='Header'],[class*='Footer'],[class*='Sidebar'],[class*='Comment'],
+    [class*='Recommend'],[class*='AppHeader']
+
+markdown_post:
+  nav_labels:
+    - 首页
+    - 发现
+    - 等你来答
+  drop_line_patterns:
+    - "知乎"
+    - "举报"

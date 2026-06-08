@@ -1,0 +1,126 @@
+# =============================================================
+# 华尔街见闻 (wallstreetcn.com) 内容提取规则
+# =============================================================
+# 平台标识，必须与 trendRadar/config/config.yaml 中的 platforms.sources[].id 一致
+platform_id: wallstreetcn-hot
+
+# 显示名称，用于日志和界面展示
+display_name: 华尔街见闻
+
+# 是否启用该规则
+enabled: true
+
+# =============================================================
+# 域名匹配配置
+# =============================================================
+# 用于无 platform_id 时的兜底匹配，填写该平台文章落地页的实际域名
+hosts:
+  - wallstreetcn.com
+  - awallstreetcn.com
+  - m.wallstreetcn.com
+
+# =============================================================
+# 爬虫阶段配置 (crawl4ai)
+# =============================================================
+crawl:
+  # 【关键】正文容器的 CSS 选择器
+  # 说明：仅用单一正文容器，避免 .rich-text + article 嵌套导致段落重复
+  primary_target: ".article__content"
+
+  # 同 primary_target，兼容旧写法
+  css_selector: ".article__content"
+
+  # 内容过滤方式
+  # 可选值：none（不使用BM25/Pruning）、bm25（按热榜标题语义过滤）、pruning（密度剪枝）
+  # 推荐：使用 none 保留完整正文
+  content_filter: none
+
+  # 是否优先使用 raw markdown 而不是重新转换
+  prefer_raw_markdown: true
+
+  # 是否启用目标元素限制
+  # true：仅提取 primary_target 指定的元素；false：使用全局正文识别
+  use_target_elements: true
+
+  # 获取 HTML 前的延迟时间（秒）
+  # 说明：给页面加载留出时间，确保动态内容渲染完成
+  delay_before_return_html: 0.6
+
+  # 等待页面加载完成的条件
+  # 可选值：domcontentloaded（DOM加载完成）、load（所有资源加载完成）、networkidle（网络空闲）
+  wait_until: load
+
+  # 【关键】额外排除的元素选择器
+  # 说明：在此处追加需要排除的非正文内容，特别注意排除限免提示、分享按钮、二维码等
+  excluded_selector_extra: >-
+    [class*='header'],[class*='Header'],[class*='footer'],[class*='Footer'],
+    [class*='sidebar'],[id*='sidebar'],[class*='side-bar'],
+    [class*='nav'],[class*='Nav'],[id*='nav'],
+    [class*='download'],[class*='Download'],[class*='app-bar'],[class*='appBar'],
+    [class*='related'],[class*='Related'],[class*='recommend'],[class*='Recommend'],
+    [class*='ad'],[class*='Ad'],[id*='ad'],[class*='advertisement'],
+    [class*='share'],[class*='Share'],[id*='share'],[class*='shareBtn'],
+    [class*='comment'],[class*='Comment'],[id*='comment'],
+    [class*='qrcode'],[id*='qrcode'],[class*='qr-code'],[class*='qrCode'],
+    [class*='qrcode-box'],[class*='qrcodeBox'],[class*='qr-code-box'],
+    [class*='login'],[id*='login'],[class*='popup'],[id*='popup'],
+    [class*='modal'],[id*='modal'],[class*='dialog'],[id*='dialog'],
+    [class*='free-tip'],[class*='freeTip'],[class*='free-trial'],[class*='freeTrial'],
+    [class*='vip-tip'],[class*='vipTip'],[class*='vip-banner'],[class*='vipBanner'],
+    [class*='paywall'],[class*='payWall'],[class*='pay-wall'],
+    [class*='subscribe'],[class*='Subscribe'],[class*='subscription'],
+    [class*='toolbar'],[class*='ToolBar'],[id*='toolbar'],
+    [class*='copyright'],[class*='Copyright'],[class*='copyrightInfo'],
+    [class*='author'],[class*='Author'],[class*='editor'],[class*='source'],
+    [class*='hot'],[class*='Hot'],[class*='hotList'],[class*='hot-list'],
+    [class*='download-app'],[class*='downloadApp'],[id*='download-app']
+
+# =============================================================
+# Markdown 后处理配置
+# =============================================================
+markdown_post:
+  # 是否对重复段落去重（华尔街见闻常见重复内容）
+  dedupe_paragraphs: true
+
+  # 是否规范化 Markdown 格式（标题、段落、列表、图片等）
+  normalize_markdown: true
+
+  # 是否在文首添加热榜摘要信息
+  prepend_hot_summary: true
+
+  # 【关键】导航标签列表
+  # 说明：行内容匹配这些词时会被当作导航项删除（纯文本或带项目符号）
+  nav_labels:
+    - 首页
+    - 资讯
+    - 快讯
+    - VIP
+    - 行情
+    - 专栏
+    - 更多
+    - 关注
+    - 收藏
+
+  # 【关键】行删除模式列表
+  # 说明：行内容包含这些字符串时会被删除（正则 OR 匹配）
+  drop_line_patterns:
+    - "免责声明"
+    - "本文版权归"
+    - "扫码关注"
+    - "微信扫一扫"
+    - "分享到"
+    - "上一篇"
+    - "下一篇"
+    - "返回首页"
+    - "相关阅读"
+    - "推荐阅读"
+    - "免费阅读"
+    - "限时免费"
+    - "VIP专享"
+    - "扫码下载"
+    - "下载APP"
+    - "打开APP"
+    - "ICP备"
+    - "网安备"
+
+

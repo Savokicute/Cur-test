@@ -1,0 +1,27 @@
+platform_id: weibo
+display_name: 微博
+enabled: true
+
+hosts:
+  - weibo.com
+  - s.weibo.com
+  - m.weibo.cn
+
+crawl:
+  # 微博正文多在 .wbpro-feed 或 article；热搜落地页结构多变，优先 article
+  css_selector: "article, .wbpro-feed, .detail_wbtext_4CRf9"
+  target_elements:
+    - "article"
+    - ".wbpro-feed"
+  use_target_elements: false
+  excluded_selector_extra: >-
+    [class*='nav'],[class*='Header'],[class*='footer'],[class*='Footer'],
+    [class*='sidebar'],[class*='hot'],[class*='recommend'],[class*='login']
+
+markdown_post:
+  nav_labels:
+    - 热搜
+    - 发现
+    - 视频
+  drop_line_patterns:
+    - "微博"

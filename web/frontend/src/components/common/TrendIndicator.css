@@ -1,0 +1,126 @@
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.trend-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 2px;
+  transition: background-color var(--motion-base, 200ms) var(--motion-easing, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.trend-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.trend-value {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.trend-label {
+  font-size: 12px;
+  color: var(--color-text-secondary, #475569);
+}
+
+/* ========== 样式变体 ========== */
+
+/* 默认变体 */
+.trend-variant-default .trend-icon-wrapper {
+  width: 28px;
+  height: 28px;
+}
+
+/* 紧凑型变体 - 用于列表视图 */
+.trend-variant-compact {
+  gap: 2px;
+}
+
+.trend-variant-compact .trend-icon-wrapper {
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+}
+
+.trend-variant-compact .trend-label,
+.trend-variant-compact .trend-value {
+  font-size: 11px;
+}
+
+/* 徽章变体 - 用于紧凑空间 */
+.trend-variant-badge {
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.trend-variant-badge .trend-icon-wrapper {
+  width: 16px;
+  height: 16px;
+  padding: 1px;
+  background-color: transparent !important;
+}
+
+.trend-variant-badge .trend-value {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ========== 动画效果 ========== */
+
+@media (prefers-reduced-motion: reduce) {
+  .trend-indicator svg {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-animated="true"] .trend-up svg {
+    animation: trend-bounce 0.4s ease-out;
+  }
+
+  [data-animated="true"] .trend-new svg {
+    animation: trend-pulse 1.5s ease-in-out infinite;
+    animation-delay: 0.5s;
+  }
+
+  /* 数值变化动画 */
+  [data-animated="true"] .trend-value {
+    animation: value-pop 0.3s ease-out;
+  }
+}
+
+@keyframes trend-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes trend-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes value-pop {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* 暗色主题适配 */
+[data-theme="dark"] .trend-variant-badge {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .trend-label {
+  color: var(--color-dark-text-secondary, #cbd5e1);
+}

@@ -1,0 +1,24 @@
+platform_id: baidu
+display_name: 百度热搜
+enabled: true
+
+hosts:
+  - baidu.com
+  - baijiahao.baidu.com
+  - news.baidu.com
+
+crawl:
+  css_selector: ".article-content, #container, article, .index_module"
+  target_elements:
+    - ".article-content"
+    - "article"
+  use_target_elements: true
+  excluded_selector_extra: >-
+    [class*='header'],[class*='footer'],[class*='sidebar'],[class*='comment'],
+    [class*='recommend'],[id*='comment']
+
+markdown_post:
+  nav_labels: []
+  drop_line_patterns:
+    - "百度"
+    - "使用百度前必读"

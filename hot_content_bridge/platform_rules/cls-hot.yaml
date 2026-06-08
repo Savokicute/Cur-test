@@ -1,0 +1,38 @@
+platform_id: cls-hot
+display_name: 财联社热门
+enabled: true
+
+hosts:
+  - cls.cn
+  - cailianpress.com
+
+crawl:
+  # 摘要 bullets 在 .detail-brief，正文在 .detail-content（仅后者会丢 ①②③）
+  css_selector: ".detail-brief, .detail-content"
+  target_elements:
+    - ".detail-brief"
+    - ".detail-content"
+  content_filter: none
+  prefer_raw_markdown: true
+  use_target_elements: true
+  delay_before_return_html: 1.2
+  wait_until: load
+  excluded_selector_extra: >-
+    [class*='header'],[class*='nav'],[class*='footer'],[class*='sidebar'],
+    [class*='comment'],[class*='related'],[class*='download'],[class*='recommend']
+
+markdown_post:
+  normalize_markdown: true
+  prepend_hot_summary: true
+  nav_labels:
+    - 电报
+    - 话题
+    - 盯盘
+    - VIP
+    - FM
+  drop_line_patterns:
+    - "版权所有"
+    - "ICP备"
+    - "互联网新闻信息服务许可证"
+    - "沪公网安备"
+    - "举报邮箱"

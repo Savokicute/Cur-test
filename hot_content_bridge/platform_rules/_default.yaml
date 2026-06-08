@@ -1,0 +1,13 @@
+# 未单独配置的平台使用此默认规则（文件名以 _ 开头表示非平台 ID 文件）
+platform_id: "_default"
+display_name: 默认
+enabled: true
+
+hosts: []
+
+crawl:
+  use_target_elements: false
+
+markdown_post:
+  nav_labels: []
+  drop_line_patterns: []

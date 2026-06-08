@@ -1,0 +1,22 @@
+platform_id: tieba
+display_name: 贴吧
+enabled: true
+
+hosts:
+  - tieba.baidu.com
+
+crawl:
+  css_selector: ".d_post_content, .j_d_post_content, #thread_content"
+  target_elements:
+    - ".d_post_content"
+    - ".j_d_post_content"
+    - "#thread_content"
+  use_target_elements: true
+  excluded_selector_extra: >-
+    [class*='header'],[class*='nav'],[class*='footer'],[class*='sidebar'],
+    [class*='comment'],[class*='recommend']
+
+markdown_post:
+  nav_labels: []
+  drop_line_patterns:
+    - "百度贴吧"

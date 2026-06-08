@@ -1,0 +1,105 @@
+.hotspot-card {
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  border: 1px solid var(--color-border);
+  height: 100%;
+}
+
+.hotspot-card:hover,
+.hotspot-card:focus-visible {
+  box-shadow: 0 4px 16px rgba(30, 64, 175, 0.12);
+  border-color: rgba(30, 64, 175, 0.25);
+}
+
+.hotspot-card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.hotspot-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.hotspot-title {
+  flex: 1;
+  margin: 0 !important;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+
+.hotspot-rank-btn {
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.hotspot-card:hover .hotspot-rank-btn,
+.hotspot-rank-btn:focus-visible {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.hotspot-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.meta-label {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ai-score {
+  font-family: var(--font-heading);
+  font-size: 12px;
+  padding: 2px 8px;
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--color-cta);
+  border-radius: 6px;
+}
+
+.hotspot-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.hotspot-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.hotspot-card:hover .hotspot-actions {
+  opacity: 1;
+}
+
+.hotspot-actions .favorited {
+  color: var(--color-error);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hotspot-card,
+  .hotspot-rank-btn,
+  .hotspot-actions {
+    transition: none;
+  }
+}

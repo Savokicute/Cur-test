@@ -1,0 +1,22 @@
+platform_id: douyin
+display_name: 抖音
+enabled: true
+
+hosts:
+  - douyin.com
+  - www.douyin.com
+  - iesdouyin.com
+
+crawl:
+  css_selector: "article, [class*='article'], .video-info-desc"
+  target_elements:
+    - "article"
+  use_target_elements: false
+  excluded_selector_extra: >-
+    [class*='header'],[class*='nav'],[class*='footer'],[class*='sidebar'],
+    [class*='comment'],[class*='related']
+
+markdown_post:
+  nav_labels: []
+  drop_line_patterns:
+    - "抖音"
