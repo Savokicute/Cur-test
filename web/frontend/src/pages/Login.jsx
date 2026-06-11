@@ -22,6 +22,7 @@ import {
   MailOutlined,
   AimOutlined,
   ThunderboltOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -40,6 +41,8 @@ export default function LoginPage() {
   const screens = Grid.useBreakpoint();
   const [activeTab, setActiveTab] = useState('login');
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState(null);
+  const [capsLockOn, setCapsLockOn] = useState(false);
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
   const [rememberMe, setRememberMe] = useState(() =>
@@ -61,9 +64,28 @@ export default function LoginPage() {
     return { score, label: labels[score], color: colors[score], percent: (score / 5) * 100 };
   };
 
+  // ---- 大写锁定检测 ----
+  const handleCapsLock = (e) => {
+    // 通过键盘事件判断 Caps Lock 状态
+    if (e.getModifierState) {
+      setCapsLockOn(e.getModifierState('CapsLock'));
+    }
+  };
+
+  const renderCapsLockWarning = () => {
+    if (!capsLockOn) return null;
+    return (
+      <div className="capslock-warning" role="alert">
+        <WarningOutlined className="capslock-icon" />
+        <span className="capslock-text">大写锁定已开启，输入密码时请注意大小写</span>
+      </div>
+    );
+  };
+
   // ---- 登录 ----
   const handleLoginFinish = async (values) => {
     setLoading(true);
+    setLoginError(null);
     try {
       const result = await authLogin({
         username: values.username,
@@ -76,7 +98,9 @@ export default function LoginPage() {
         navigate(from, { replace: true });
       }
     } catch (err) {
-      message.error(err.response?.data?.detail || err.message || '登录失败');
+      const errMsg = err.response?.data?.detail || err.message || '登录失败，请检查用户名和密码';
+      setLoginError(errMsg);
+      message.error(errMsg);
     } finally {
       setLoading(false);
     }
@@ -304,6 +328,33 @@ export default function LoginPage() {
             key: 'login',
             label: (<span><LockOutlined /> 登录</span>),
             children: (
+              <div>
+                {loginError && (
+                  <div className="error-alert" role="alert">
+                    <div className="error-alert-icon">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.5" />
+                        <line x1="7" y1="7" x2="13" y2="13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <line x1="13" y1="7" x2="7" y2="13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <div className="error-alert-content">
+                      <div className="error-alert-title">登录失败</div>
+                      <div className="error-alert-desc">{loginError}</div>
+                    </div>
+                    <button
+                      className="error-alert-close"
+                      onClick={() => setLoginError(null)}
+                      aria-label="关闭"
+                      type="button"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <line x1="3" y1="3" x2="11" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <line x1="11" y1="3" x2="3" y2="11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
               <Form form={loginForm} onFinish={handleLoginFinish} layout="vertical"
                 requiredMark={false} size="large" className="login-form">
                 <Form.Item name="username" rules={[{ required: true, message: '请输入用户名' }]}>
@@ -321,8 +372,11 @@ export default function LoginPage() {
                     placeholder="密码"
                     autoComplete="current-password"
                     className="custom-input"
+                    onKeyDown={handleCapsLock}
+                    onKeyUp={handleCapsLock}
                   />
                 </Form.Item>
+                {renderCapsLockWarning()}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24, alignItems: 'center' }}>
                   <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
                     记住我
@@ -348,6 +402,7 @@ export default function LoginPage() {
                   登 录
                 </Button>
               </Form>
+              </div>
             ),
           },
           {
@@ -373,9 +428,12 @@ export default function LoginPage() {
                     placeholder="密码（8位+复杂度）"
                     className="custom-input"
                     onChange={(e) => setPasswordStrength(calcPasswordStrength(e.target.value))}
+                    onKeyDown={handleCapsLock}
+                    onKeyUp={handleCapsLock}
                   />
                 </Form.Item>
                 {renderPasswordStrength()}
+                {renderCapsLockWarning()}
                 <Form.Item name="reg_confirm_password" dependencies={['reg_password']} rules={[
                   { required: true, message: '请确认密码' },
                   ({ getFieldValue }) => ({
@@ -385,7 +443,9 @@ export default function LoginPage() {
                     },
                   }),
                 ]}>
-                  <Input.Password prefix={<SafetyCertificateOutlined className="input-prefix-icon" />} placeholder="确认密码" className="custom-input" />
+                  <Input.Password prefix={<SafetyCertificateOutlined className="input-prefix-icon" />} placeholder="确认密码" className="custom-input"
+                    onKeyDown={handleCapsLock} onKeyUp={handleCapsLock}
+                  />
                 </Form.Item>
                 <Form.Item name="reg_email">
                   <Input prefix={<MailOutlined className="input-prefix-icon" />} placeholder="邮箱（选填）" className="custom-input" />
@@ -494,6 +554,44 @@ export default function LoginPage() {
           to { opacity: 1; transform: translateX(0); }
         }
 
+        @keyframes shakeAlert {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-8px); }
+          40% { transform: translateX(8px); }
+          60% { transform: translateX(-6px); }
+          80% { transform: translateX(6px); }
+        }
+
+        /* 大写锁定提示 */
+        .capslock-warning {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          margin-top: -12px;
+          margin-bottom: 16px;
+          background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(251,191,36,0.05));
+          border: 1px solid rgba(245,158,11,0.25);
+          border-left: 3px solid #F59E0B;
+          border-radius: 8px;
+          animation: capslockFadeIn 0.3s ease;
+        }
+        .capslock-icon {
+          color: #F59E0B;
+          font-size: 16px;
+          flex-shrink: 0;
+        }
+        .capslock-text {
+          color: #92400E;
+          font-size: 13px;
+          line-height: 1.5;
+          font-weight: 500;
+        }
+        @keyframes capslockFadeIn {
+          from { opacity: 0; transform: translateY(-6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
         /* 自定义输入框样式 */
         .custom-input {
           border-radius: 8px !important;
@@ -539,6 +637,89 @@ export default function LoginPage() {
         /* 表单项间距 */
         .login-form .ant-form-item {
           margin-bottom: 20px;
+        }
+
+        /* 自定义错误提示样式 */
+        .error-alert {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 14px 16px;
+          margin-bottom: 20px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.06) 0%, rgba(249, 115, 22, 0.05) 100%);
+          border: 1px solid rgba(239, 68, 68, 0.12);
+          position: relative;
+          overflow: hidden;
+          animation: slideInShake 0.5s ease;
+        }
+        .error-alert::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          background: linear-gradient(180deg, #EF4444, #F97316);
+          border-radius: 0 2px 2px 0;
+        }
+        .error-alert-icon {
+          flex-shrink: 0;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(249, 115, 22, 0.08));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #EF4444;
+        }
+        .error-alert-content {
+          flex: 1;
+          min-width: 0;
+          padding-top: 1px;
+        }
+        .error-alert-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #DC2626;
+          margin-bottom: 3px;
+          line-height: 1.4;
+        }
+        .error-alert-desc {
+          font-size: 13px;
+          color: #7F1D1D;
+          opacity: 0.8;
+          line-height: 1.5;
+          word-break: break-word;
+        }
+        .error-alert-close {
+          flex-shrink: 0;
+          width: 28px;
+          height: 28px;
+          border: none;
+          background: transparent;
+          border-radius: 6px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #9CA3AF;
+          transition: all 0.2s ease;
+          margin-top: 1px;
+        }
+        .error-alert-close:hover {
+          background: rgba(239, 68, 68, 0.08);
+          color: #EF4444;
+        }
+
+        @keyframes slideInShake {
+          0% { opacity: 0; transform: translateY(-8px); }
+          20% { opacity: 1; transform: translateY(0) translateX(-6px); }
+          40% { transform: translateX(6px); }
+          60% { transform: translateX(-4px); }
+          80% { transform: translateX(3px); }
+          100% { transform: translateX(0); }
         }
 
         /* 复选框样式 */

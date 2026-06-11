@@ -30,24 +30,28 @@ import './AppShell.css';
 const { Header, Content, Sider } = Layout;
 
 const NAV_ITEMS = [
+  // ===== 普通用户可见 =====
   { key: '/', icon: <Flame size={18} />, label: '热榜总览' },
   { key: '/assistant', icon: <Bot size={18} />, label: '智能助手' },
   { key: '/ai-analysis', icon: <BarChart3 size={18} />, label: 'AI分析' },
   { key: '/wechat', icon: <MessageSquare size={18} />, label: '微信公众号' },
   { key: '/materials', icon: <Bookmark size={18} />, label: '素材中心' },
   { type: 'divider' },
-  { key: '/sources', icon: <Radar size={18} />, label: '采集源配置' },
-  { key: '/keywords', icon: <Search size={18} />, label: '关键词配置' },
-  { key: '/notifications', icon: <Bell size={18} />, label: '通知配置' },
+  // ===== 仅管理员可见 =====
+  { key: '/sources', icon: <Radar size={18} />, label: '采集源配置', adminOnly: true },
+  { key: '/keywords', icon: <Search size={18} />, label: '关键词配置', adminOnly: true },
+  { key: '/notifications', icon: <Bell size={18} />, label: '通知配置', adminOnly: true },
   { type: 'divider' },
-  { key: '/settings', icon: <Settings size={18} />, label: '系统设置' },
-  { key: '/ai-config', icon: <Brain size={18} />, label: 'AI 智能' },
-  { key: '/content', icon: <FileText size={18} />, label: '内容策略' },
-  { key: '/users', icon: <UserOutlined />, label: '用户管理' },
+  { key: '/settings', icon: <Settings size={18} />, label: '系统设置', adminOnly: true },
+  { key: '/ai-config', icon: <Brain size={18} />, label: 'AI 智能', adminOnly: true },
+  { key: '/content', icon: <FileText size={18} />, label: '内容策略', adminOnly: true },
+  { key: '/users', icon: <UserOutlined />, label: '用户管理', adminOnly: true },
+  // ===== 普通用户可见 =====
   { key: '/profile', icon: <UserOutlined />, label: '个人中心' },
   { type: 'divider' },
-  { key: '/notify', icon: <Database size={18} />, label: '通知存储' },
-  { key: '/media-test', icon: <PictureOutlined size={18} />, label: '媒体测试' },
+  // ===== 仅管理员可见 =====
+  { key: '/notify', icon: <Database size={18} />, label: '通知存储', adminOnly: true },
+  { key: '/media-test', icon: <PictureOutlined size={18} />, label: '媒体测试', adminOnly: true },
 ];
 
 function NavIcon({ icon }) {

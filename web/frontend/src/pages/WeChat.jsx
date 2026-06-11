@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, Col, Row, Avatar, Button, Input, Tabs, Tag, Typography, Badge, Space, Spin, Alert, message, Tooltip, Modal, Form, Input as AntInput } from 'antd';
-import { Newspaper, RefreshCw, Plus, Search, ExternalLink, AlertTriangle, LogIn, Settings, ArrowRight, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Card, Col, Row, Avatar, Button, Input, Tabs, Tag, Typography, Badge, Space, Spin, Alert, message, Tooltip } from 'antd';
+import { Newspaper, Search, ExternalLink, AlertTriangle, LogIn, ArrowRight } from 'lucide-react';
 import PageHeader from '../components/common/PageHeader';
 import {
   getWechatMps,
@@ -20,104 +20,9 @@ const WeChat = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [serviceAvailable, setServiceAvailable] = useState(true);
   const [isMockMode, setIsMockMode] = useState(false);
+  // we-mp-rss 服务连接状态
+  const [wempStatus, setWempStatus] = useState('checking'); // 'checking' | 'online' | 'offline'
   
-  // SSO 相关状态
-  const [ssoModalVisible, setSsoModalVisible] = useState(false);
-  const [ssoLoading, setSsoLoading] = useState(false);
-  const [ssoStatus, setSsoStatus] = useState(null); // "checking" | "online" | "offline"
-  const [loginForm] = Form.useForm();
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // 检查 SSO 状态
-  const checkSSOStatus = async () => {
-    setSsoStatus('checking');
-    try {
-      const response = await fetch('/api/sso/status');
-      const data = await response.json();
-      setSsoStatus(data.wemp_online ? 'online' : 'offline');
-      
-      // 从 localStorage 获取用户信息（如果有）
-      const savedUser = localStorage.getItem('trendradar_user');
-      if (savedUser) {
-        setCurrentUser(JSON.parse(savedUser));
-      }
-    } catch (err) {
-      console.error('检查SSO状态失败:', err);
-      setSsoStatus('offline');
-    }
-  };
-
-  // SSO 登录
-  const handleSSOLogin = async (values) => {
-    setSsoLoading(true);
-    try {
-      const response = await fetch('/api/sso/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: values.username,
-          password: values.password,
-          target_path: '/'  // 跳转到 we-mp-rss 首页
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (data.success && data.auto_login_url) {
-        // 保存用户信息
-        localStorage.setItem('trendradar_user', JSON.stringify({
-          username: values.username,
-          loginTime: new Date().toISOString()
-        }));
-        
-        message.success({
-          content: '✅ 登录成功！正在跳转...',
-          duration: 2
-        });
-        
-        // 延迟一下让用户看到成功提示
-        setTimeout(() => {
-          window.open(data.auto_login_url, '_blank');
-          setSsoModalVisible(false);
-        }, 800);
-      } else {
-        message.error(data.message || '登录失败');
-      }
-    } catch (err) {
-      console.error('SSO登录失败:', err);
-      message.error('登录请求失败：' + err.message);
-    } finally {
-      setSsoLoading(false);
-    }
-  };
-
-  // 快速跳转（已缓存的用户）
-  const handleQuickJump = async () => {
-    if (!currentUser) {
-      setSsoModalVisible(true);
-      return;
-    }
-    
-    setSsoLoading(true);
-    try {
-      const response = await fetch(`/api/sso/generate-url?username=${currentUser.username}&target=/`);
-      const data = await response.json();
-      
-      if (data.success) {
-        window.open(data.url, '_blank');
-      } else {
-        // 缓存过期，需要重新登录
-        message.info('登录已过期，请重新登录');
-        setSsoModalVisible(true);
-      }
-    } catch (err) {
-      console.error('快速跳转失败:', err);
-      message.error('跳转失败');
-    } finally {
-      setSsoLoading(false);
-    }
-  };
-
   // 检查服务状态（增强版：检测 Mock 模式）
   const checkServiceStatus = async () => {
     try {
@@ -141,6 +46,23 @@ const WeChat = () => {
       return false;
     }
     return true;
+  };
+
+  // 检测 we-mp-rss 服务是否在线
+  const checkWempStatus = async () => {
+    setWempStatus('checking');
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch('http://localhost:8001/api/v1/system/info', {
+        signal: controller.signal,
+        mode: 'no-cors',
+      });
+      clearTimeout(timeoutId);
+      setWempStatus('online');
+    } catch {
+      setWempStatus('offline');
+    }
   };
   
   // 获取公众号列表（支持 Mock 模式）
@@ -193,7 +115,7 @@ const WeChat = () => {
   // 初始化
   useEffect(() => {
     checkServiceStatus();
-    checkSSOStatus();
+    checkWempStatus();
     fetchMps();
     fetchArticles();
   }, []);
@@ -209,38 +131,12 @@ const WeChat = () => {
     (mp.account || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // SSO 状态指示器
-  const renderSSOIndicator = () => (
-    <div className="sso-indicator">
-      <Space>
-        <span style={{ fontSize: 13, color: '#666' }}>
-          微信管理服务：
-        </span>
-        {ssoStatus === 'checking' && (
-          <Tag icon={<Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />} color="processing">
-            检测中...
-          </Tag>
-        )}
-        {ssoStatus === 'online' && (
-          <Tag icon={<CheckCircle2 size={12} />} color="success">
-            在线
-          </Tag>
-        )}
-        {ssoStatus === 'offline' && (
-          <Tag icon={<XCircle size={12} />} color="error">
-            离线
-          </Tag>
-        )}
-      </Space>
-    </div>
-  );
-  
   // 完整管理入口卡片
   const renderManagementCard = () => (
-    <Card 
+    <Card
       className="management-entry-card"
-      style={{ 
-        marginBottom: 20, 
+      style={{
+        marginBottom: 20,
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         border: 'none'
       }}
@@ -256,7 +152,15 @@ const WeChat = () => {
               <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13 }}>
                 订阅、抓取、阅读、收藏 - we-mp-rss 全功能平台
               </Text>
-              {renderSSOIndicator()}
+              {/* 服务状态指示 */}
+              <div className="wemp-status-indicator">
+                <span className="wemp-status-dot" data-status={wempStatus} />
+                <span className="wemp-status-text">
+                  {wempStatus === 'checking' && '正在检测服务...'}
+                  {wempStatus === 'online' && 'we-mp-rss 服务已连接'}
+                  {wempStatus === 'offline' && 'we-mp-rss 服务未启动'}
+                </span>
+              </div>
             </Space>
           </div>
         </Col>
@@ -265,11 +169,9 @@ const WeChat = () => {
             type="primary"
             size="large"
             icon={<ArrowRight size={18} />}
-            loading={ssoLoading}
-            disabled={ssoStatus === 'offline'}
-            onClick={handleQuickJump}
-            style={{ 
-              background: 'white', 
+            onClick={() => window.open('http://localhost:8001/login', '_blank')}
+            style={{
+              background: 'white',
               color: '#667eea',
               fontWeight: 600,
               height: 48,
@@ -283,24 +185,24 @@ const WeChat = () => {
           </Button>
         </Col>
       </Row>
-      
+
       {/* 功能特性标签 */}
       <div style={{ marginTop: 16 }}>
         <Space wrap size={[8, 8]}>
           <Tag style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>
-            ✅ 公众号订阅管理
+            公众号订阅管理
           </Tag>
           <Tag style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>
-            ✅ 文章自动抓取
+            文章自动抓取
           </Tag>
           <Tag style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>
-            ✅ RSS 输出
+            RSS 输出
           </Tag>
           <Tag style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>
-            ✅ 全文阅读器
+            全文阅读器
           </Tag>
           <Tag style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>
-            ✅ 标签分类
+            标签分类
           </Tag>
         </Space>
       </div>
@@ -312,19 +214,6 @@ const WeChat = () => {
       <PageHeader
         title="微信公众号"
         description="订阅公众号文章，统一管理阅读与收藏"
-        extra={
-          <Space>
-            <Button 
-              icon={<Settings size={16} />}
-              onClick={() => setSsoModalVisible(true)}
-            >
-              账户设置
-            </Button>
-            <Button type="primary" icon={<Plus size={16} />} disabled={isMockMode}>
-              添加公众号
-            </Button>
-          </Space>
-        }
       />
 
       {/* 完整管理入口 */}
@@ -348,19 +237,6 @@ const WeChat = () => {
                 <li>刷新本页面</li>
               </ol>
               <p>或者使用一键启动脚本：<code>python scripts/start_platform.py</code></p>
-              
-              {!isMockMode && ssoStatus === 'online' && (
-                <div style={{ marginTop: 12 }}>
-                  <Button 
-                    type="link" 
-                    icon={<LogIn size={14} />}
-                    onClick={() => setSsoModalVisible(true)}
-                    style={{ padding: 0, color: '#667eea' }}
-                  >
-                    或直接登录完整管理系统 →
-                  </Button>
-                </div>
-              )}
             </div>
           }
           type="warning"
@@ -464,24 +340,6 @@ const WeChat = () => {
                           >
                             查看文章
                           </Button>
-                          <Tooltip title={isMockMode ? "需要启动 we-mp-rss 服务" : "抓取最新文章"}>
-                            <Button
-                              size="small"
-                              type="link"
-                              icon={<RefreshCw size={12} />}
-                              disabled={isMockMode}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (isMockMode) {
-                                  message.warning('当前为演示模式，无法抓取文章');
-                                  return;
-                                }
-                                message.info('正在刷新...');
-                              }}
-                            >
-                              抓取
-                            </Button>
-                          </Tooltip>
                         </div>
                       </div>
                     </Space>
@@ -490,19 +348,6 @@ const WeChat = () => {
               ) : (
                 <Card title="公众号列表">
                   <Text type="secondary">暂无公众号数据</Text>
-                  
-                  {!isMockMode && ssoStatus === 'online' && (
-                    <div style={{ marginTop: 12 }}>
-                      <Button 
-                        type="primary" 
-                        icon={<LogIn size={14} />}
-                        onClick={() => setSsoModalVisible(true)}
-                        block
-                      >
-                        登录完整管理系统添加公众号
-                      </Button>
-                    </div>
-                  )}
                 </Card>
               )}
             </Spin>
@@ -547,22 +392,14 @@ const WeChat = () => {
                         >
                           原文链接
                         </Button>,
-                        <Tooltip title={isMockMode ? "需要启动 we-mp-rss 服务" : "在完整系统中查看"}>
-                          <Button
-                            type="text"
-                            size="small"
-                            icon={<ExternalLink size={14} />}
-                            onClick={() => {
-                              if (!isMockMode && ssoStatus === 'online') {
-                                handleQuickJump();
-                              } else {
-                                message.warning(isMockMode ? '需要启动服务' : '服务未在线');
-                              }
-                            }}
-                          >
-                            完整版查看
-                          </Button>
-                        </Tooltip>,
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<ExternalLink size={14} />}
+                          onClick={() => window.open('http://localhost:8001/login', '_blank')}
+                        >
+                          完整版查看
+                        </Button>,
                       ]}
                     >
                       <Space align="start">
@@ -595,114 +432,6 @@ const WeChat = () => {
         </Col>
       </Row>
 
-      {/* SSO 登录弹窗 */}
-      <Modal
-        title={
-          <Space>
-            <LogIn size={20} />
-            <span>登录微信管理系统</span>
-          </Space>
-        }
-        open={ssoModalVisible}
-        onCancel={() => setSsoModalVisible(false)}
-        footer={null}
-        width={420}
-      >
-        <div style={{ padding: '16px 0' }}>
-          {ssoStatus === 'offline' ? (
-            <Alert
-              message="服务未启动"
-              description={
-                <div>
-                  <p>we-mp-rss 服务当前离线。</p>
-                  <p style={{ marginTop: 8 }}>请先启动服务：</p>
-                  <pre style={{ background: '#f5f5f5', padding: 12, borderRadius: 6, marginTop: 8 }}>
-{`cd we-mp-rss
-python main.py -job True`}
-                  </pre>
-                </div>
-              }
-              type="warning"
-              showIcon
-            />
-          ) : (
-            <>
-              <div style={{ marginBottom: 20, textAlign: 'center' }}>
-                <div style={{
-                  width: 64, height: 64, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 16px'
-                }}>
-                  <LogIn size={32} color="white" />
-                </div>
-                <Text strong style={{ fontSize: 16 }}>
-                  使用热点平台账户登录 we-mp-rss
-                </Text>
-                <br />
-                <Text type="secondary" style={{ fontSize: 13 }}>
-                  两个系统将共享相同的账户信息
-                </Text>
-              </div>
-              
-              <Form
-                form={loginForm}
-                onFinish={handleSSOLogin}
-                layout="vertical"
-                initialValues={currentUser ? { username: currentUser.username } : {}}
-              >
-                <Form.Item
-                  name="username"
-                  rules={[{ required: true, message: '请输入用户名' }]}
-                >
-                  <AntInput 
-                    prefix={<span style={{ color: '#999' }}>👤</span>} 
-                    placeholder="用户名" 
-                    size="large"
-                  />
-                </Form.Item>
-                
-                <Form.Item
-                  name="password"
-                  rules={[{ required: true, message: '请输入密码' }]}
-                >
-                  <AntInput.Password 
-                    prefix={<span style={{ color: '#999' }}>🔒</span>} 
-                    placeholder="密码" 
-                    size="large"
-                  />
-                </Form.Item>
-                
-                <Form.Item>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={ssoLoading}
-                    block
-                    size="large"
-                    style={{ 
-                      height: 48, 
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      border: 'none',
-                      fontWeight: 600,
-                      fontSize: 16
-                    }}
-                  >
-                    {ssoLoading ? '正在登录...' : '登录并跳转 →'}
-                  </Button>
-                </Form.Item>
-              </Form>
-              
-              <div style={{ textAlign: 'center', marginTop: 16 }}>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  💡 提示：首次使用需要在 we-mp-rss 中注册相同账户
-                </Text>
-              </div>
-            </>
-          )}
-        </div>
-      </Modal>
-
       <style>{`
         .wechat-page {
           max-width: 1400px;
@@ -713,13 +442,44 @@ python main.py -job True`}
           padding: 24px;
         }
         
-        .sso-indicator {
-          margin-top: 4px;
+        .wemp-status-indicator {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 6px;
         }
-        
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+
+        .wemp-status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #999;
+          transition: all 0.3s ease;
+          flex-shrink: 0;
+        }
+
+        .wemp-status-dot[data-status="checking"] {
+          background: #faad14;
+          animation: wempPulse 1.5s ease-in-out infinite;
+        }
+
+        .wemp-status-dot[data-status="online"] {
+          background: #52c41a;
+          box-shadow: 0 0 6px rgba(82, 196, 26, 0.5);
+        }
+
+        .wemp-status-dot[data-status="offline"] {
+          background: #ff4d4f;
+        }
+
+        .wemp-status-text {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.85);
+        }
+
+        @keyframes wempPulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.2); }
         }
         
         .wechat-account-card:hover {

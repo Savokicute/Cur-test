@@ -18,6 +18,7 @@ import Notifications from '../pages/Notifications';
 import UserManagement from '../pages/UserManagement';
 import Login from '../pages/Login';
 import AuthGuard from '../components/common/AuthGuard';
+import AdminGuard from '../components/common/AdminGuard';
 import ProfilePage from '../pages/ProfilePage';
 
 const router = createBrowserRouter([
@@ -47,35 +48,67 @@ const router = createBrowserRouter([
       },
       {
         path: 'sources',
-        element: <Sources />,
+        element: (
+          <AdminGuard>
+            <Sources />
+          </AdminGuard>
+        ),
       },
       {
         path: 'settings',
-        element: <Settings />,
+        element: (
+          <AdminGuard>
+            <Settings />
+          </AdminGuard>
+        ),
       },
       {
         path: 'ai-config',
-        element: <AIConfig />,
+        element: (
+          <AdminGuard>
+            <AIConfig />
+          </AdminGuard>
+        ),
       },
       {
         path: 'content',
-        element: <ContentPolicy />,
+        element: (
+          <AdminGuard>
+            <ContentPolicy />
+          </AdminGuard>
+        ),
       },
       {
         path: 'notify',
-        element: <NotifyStorage />,
+        element: (
+          <AdminGuard>
+            <NotifyStorage />
+          </AdminGuard>
+        ),
       },
       {
         path: 'notifications',
-        element: <Notifications />,
+        element: (
+          <AdminGuard>
+            <Notifications />
+          </AdminGuard>
+        ),
       },
       {
         path: 'media-test',
-        element: <MediaTest />,
+        element: (
+          <AdminGuard>
+            <MediaTest />
+          </AdminGuard>
+        ),
       },
       {
         path: 'keywords',
-        element: <Keywords />,
+        element: (
+          <AdminGuard>
+            <Keywords />
+          </AdminGuard>
+        ),
       },
       {
         path: 'assistant',
@@ -88,9 +121,9 @@ const router = createBrowserRouter([
       {
         path: 'users',
         element: (
-          <AuthGuard>
+          <AdminGuard>
             <UserManagement />
-          </AuthGuard>
+          </AdminGuard>
         ),
       },
       {
