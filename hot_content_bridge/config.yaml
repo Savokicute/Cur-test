@@ -4,7 +4,7 @@
 pipeline_daemon:
   enabled: true
   run_on_startup: true          # 启动后立即执行一轮（热榜 + 正文）
-  hotlist_interval_minutes: 30   # daemon 轮询间隔（分钟）— 仅触发，实际执行由 timeline.yaml 控制
+  hotlist_interval_minutes: 90   # daemon 轮询间隔（分钟）— 仅触发，实际执行由 timeline.yaml 控制
   initial_delay_seconds: 5      # 首次执行前等待（秒）
   full_trendradar_sync: false   # false=仅热榜入库(推荐); true=完整 trendradar(受 schedule 影响可能跳过采集)
   crawl_after_hotlist: true       # 热榜完成后自动正文爬取

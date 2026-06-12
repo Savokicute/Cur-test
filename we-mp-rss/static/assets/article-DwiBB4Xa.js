@@ -1,0 +1,1 @@
+import{v as e}from"./http-BFM-vxcP.js";export{e as getArticles};

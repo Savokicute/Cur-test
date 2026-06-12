@@ -1,0 +1,1 @@
+import{v as e}from"./http-lurzDmf2.js";export{e as getArticles};

@@ -1,0 +1,279 @@
+# ============================================================
+# TrendRadar 配置文件 v2.2
+# ============================================================
+# 说明：
+#   本文件为 TrendRadar 的主配置文件，包含采集平台、AI 分析、通知推送等所有配置。
+#   修改后保存即可生效（守护进程模式下会自动重载）。
+#
+# 配置结构：
+#   app              → 全局应用设置
+#   schedule         → 调度系统（何时运行）
+#   platforms        → 热榜监控平台列表
+#   rss              → RSS 订阅源
+#   report           → HTML 报告生成
+#   filter           → 内容筛选策略
+#   ai_filter        → AI 智能筛选
+#   display          → 报告显示区域控制
+#   notification     → 推送通知渠道
+#   storage          → 数据存储后端
+#   ai               → AI 模型配置
+#   ai_analysis      → AI 深度分析
+#   ai_translation   → AI 翻译
+#   advanced         → 高级选项
+
+app:
+  timezone: Asia/Shanghai                    # 时区设置
+  show_version_update: true                 # 是否显示版本更新提示
+
+# ============================================================
+# 调度系统 (Schedule)
+# ============================================================
+# 控制 TrendRadar 何时执行采集、分析和推送。
+# 详细时间段定义请参阅 timeline.yaml
+schedule:
+  enabled: true                             # 总开关：是否启用调度系统
+  preset: morning_evening                   # 预设方案：morning_evening(早晚各一次)
+
+# ============================================================
+# 热榜监控平台 (Platforms)
+# ============================================================
+platforms:
+  enabled: true                             # 总开关：是否启用热榜采集
+  sources:
+    # ── 金融/财经类 ──
+    - id: wallstreetcn-hot
+      name: 华尔街见闻
+      enabled: true                         # 单平台开关（保留兼容性，实际由总开关统一控制）
+
+    - id: thepaper
+      name: 澎湃新闻
+      enabled: true
+
+    - id: cls-hot
+      name: 财联社热门
+      enabled: true
+
+    # ── 综合新闻类 ──
+    - id: ifeng
+      name: 凤凰网
+      enabled: true
+
+    # ── 测试/调试用 ──
+    - id: debug-del-test
+      name: DebugDelTest
+      enabled: false                        # 默认禁用，用于调试
+
+# ============================================================
+# RSS 订阅源 (RSS Feeds)
+# ============================================================
+rss:
+  enabled: true                             # RSS 采集总开关
+  freshness_filter:
+    enabled: true                           # 启用新鲜度过滤
+    max_age_days: 1                         # 最大文章年龄（天），超过则跳过
+  feeds:
+    # 自定义源示例
+    - id: custom-feed
+      name: 自定义源
+      url: https://example.com/feed.xml
+      enabled: false                        # 示例源默认禁用
+      max_age_days: 0
+
+# ============================================================
+# 报告生成 (Report)
+# ============================================================
+report:
+  mode: current                             # 报告模式：current=当前榜单, daily=每日汇总
+  display_mode: platform                    # 显示模式：platform=按平台分组
+  sort_by_position_first: false             # 是否按排名优先排序
+  rank_threshold: 5                         # 排名阈值（低于此排名的不显示）
+  max_news_per_keyword: 0                   # 每个关键词最大新闻数（0=不限制）
+
+# ============================================================
+# 内容筛选 (Filter)
+# ============================================================
+filter:
+  method: ai                                # 筛选方法：ai=智能筛选, keyword=关键词匹配
+  priority_sort_enabled: true               # 启用优先级排序
+
+# ============================================================
+# AI 智能筛选 (AI Filter)
+# ============================================================
+ai_filter:
+  batch_size: 200                          # 批处理大小
+  batch_interval: 2                        # 批次间隔（秒）
+  min_score: 0.7                           # 最低置信度阈值
+  reclassify_threshold: 0.6                 # 重分类阈值
+  prompt_file: prompt.txt                  # 提示词文件
+  extract_prompt_file: extract_prompt.txt  # 标签提取提示词
+  update_tags_prompt_file: update_tags_prompt.txt  # 标签更新提示词
+
+# ============================================================
+# 报告显示区域 (Display Regions)
+# ============================================================
+display:
+  region_order:                             # 区域显示顺序
+    - new_items                             # 新增条目区
+    - hotlist                               # 当前热榜区
+    - rss                                   # RSS 区域
+    - standalone                            # 独立来源区
+    - ai_analysis                           # AI 分析区
+
+  regions:                                  # 各区域显隐控制
+    hotlist: true
+    new_items: false
+    rss: true
+    standalone: false
+    ai_analysis: true                       # AI 分析区域
+
+  standalone:
+    platforms:                              # 独立来源平台白名单
+      - zhihu
+      - wallstreetcn-hot
+    rss_feeds: []                           # RSS 来源白名单
+    max_items: 20                           # 最大显示条数
+
+# ============================================================
+# 推送通知 (Notification)
+# ============================================================
+notification:
+  enabled: true                             # 通知总开关
+  channels:
+    # ── 即时通讯类 ──
+    feishu:
+      webhook_url: ''                       # 飞书 Webhook URL
+    dingtalk:
+      webhook_url: ''                       # 钉钉 Webhook URL
+    wework:
+      webhook_url: ''                       # 企业微信 Webhook URL
+      msg_type: markdown                   # 消息类型：markdown / text
+
+    # ── Telegram ──
+    telegram:
+      bot_token: ''                         # Telegram Bot Token
+      chat_id: ''                           # Telegram Chat ID
+
+    # ── 邮件 ──
+    email:
+      from: ''                              # 发件人地址
+      password: ''                          # SMTP 密码/授权码
+      to: ''                                # 收件人地址
+      smtp_server: ''                       # SMTP 服务器
+      smtp_port: ''                         # SMTP 端口
+
+    # ── 轻量推送 ──
+    ntfy:
+      server_url: https://ntfy.sh           # ntfy 服务器地址
+      topic: ''                             # ntfy 主题
+      token: ''                             # ntfy Token
+    bark:
+      url: ''                               # Bark 推送 URL
+
+    # ── 团队协作 ──
+    slack:
+      webhook_url: ''                       # Slack Webhook URL
+    generic_webhook:
+      webhook_url: ''                       # 通用 Webhook URL
+      payload_template: ''                  # 自定义 payload 模板
+
+# ============================================================
+# 数据存储 (Storage)
+# ============================================================
+storage:
+  backend: auto                             # 存储后端：auto=自动选择, local=本地, remote=远程
+  formats:
+    sqlite: true                            # SQLite 数据库
+    txt: false                              # 纯文本备份
+    html: true                              # HTML 报告
+  local:
+    data_dir: output                        # 本地数据目录
+    retention_days: 0                       # 本地保留天数（0=永久）
+  remote:
+    retention_days: 0                       # 远程保留天数
+    endpoint_url: ''                        # 远程端点 URL
+    bucket_name: ''                         # 对象存储桶名
+    access_key_id: ''                       # Access Key ID
+    secret_access_key: ''                   # Secret Access Key
+    region: ''                              # 区域
+  pull:
+    enabled: false                          # 远程拉取开关
+    days: 7                                 # 拉取天数范围
+
+# ============================================================
+# AI 模型配置 (AI Model)
+# ============================================================
+# 支持任意 OpenAI 兼容的 API（通过 litellm 调用）
+# 💡 常见 provider 前缀：openai/ deepseek/ anthropic/ google/
+# 💡 超级重要：连接非 OpenAI 官方 API 时，model 必须写成 "openai/模型名" 格式
+#                （原理：前缀 openai/ 强制 LiteLLM 使用 OpenAI 协议格式进行通信）
+ai:
+  model: "openai/glm-4-flash"               # 模型名称（含 provider 前缀）
+  api_key: "8a11ce4bf38b4c91a9a29bd50dad5b5b.4H3gSrNmmhFK51b4"  # API 密钥
+  api_base: "https://open.bigmodel.cn/api/paas/v4"  # 智谱 AI OpenAI 兼容接口
+  timeout: 120                              # 请求超时（秒）
+  temperature: 1.0                          # 温度参数（0-2，越高越随机）
+  max_tokens: 5000                          # 最大输出 token 数
+  num_retries: 1                            # 失败重试次数
+  fallback_models: []                       # 备用模型列表
+
+# ============================================================
+# AI 深度分析 (AI Analysis)
+# ============================================================
+ai_analysis:
+  enabled: true                             # 是否启用 AI 深度分析
+  language: Chinese                        # 分析语言
+  prompt_file: ai_analysis_prompt.txt       # 分析提示词文件
+  mode: follow_report                      # 分析模式：follow_report=跟随报告, independent=独立
+  max_news_for_analysis: 150               # 参与分析的最大新闻数
+  include_rss: false                       # 是否包含 RSS 内容
+  include_standalone: true                 # 是否包含独立来源
+  include_rank_timeline: true              # 是否包含排名时间线
+
+# ============================================================
+# AI 翻译 (AI Translation)
+# ============================================================
+ai_translation:
+  enabled: true                             # 是否启用 AI 翻译
+  language: 中文                           # 目标语言
+  prompt_file: ai_translation_prompt.txt    # 翻译提示词文件
+  scope:                                   # 翻译范围
+    hotlist: false                         # 是否翻译热榜内容
+    rss: true                              # 是否翻译 RSS 内容
+    standalone: true                       # 是否翻译独立来源
+
+# ============================================================
+# 高级选项 (Advanced)
+# ============================================================
+advanced:
+  debug: false                              # 调试模式（输出详细日志）
+  version_check_url: https://raw.githubusercontent.com/sansan0/TrendRadar/refs/heads/master/version
+  mcp_version_check_url: https://raw.githubusercontent.com/sansan0/TrendRadar/refs/heads/master/version_mcp
+  configs_version_check_url: https://raw.githubusercontent.com/sansan0/TrendRadar/refs/heads/master/version_configs
+
+  # ── 爬虫设置 ──
+  crawler:
+    request_interval: 2000                 # 请求间隔（毫秒）
+    use_proxy: false                        # 是否使用代理
+    default_proxy: http://127.0.0.1:10801  # 默认代理地址
+  rss:
+    request_interval: 1000                 # RSS 请求间隔（毫秒）
+    timeout: 15                            # RSS 超时（秒）
+    use_proxy: false                        # RSS 是否使用代理
+    proxy_url: ''                          # RSS 专用代理
+
+  # ── 权重计算 ──
+  weight:
+    rank: 0.6                               # 排名权重
+    frequency: 0.3                          # 频率权重
+    hotness: 0.1                            # 热度权重
+    max_accounts_per_channel: 3            # 每频道最大账号数
+
+  # ── 批量发送 ──
+  batch_size:
+    default: 4000                           # 默认批量大小
+    dingtalk: 20000                         # 钉钉批量大小
+    feishu: 30000                           # 飞书批量大小
+    bark: 4000                              # Bark 批量大小
+    slack: 4000                             # Slack 批量大小
+  batch_send_interval: 3                    # 批量发送间隔（秒）
+  feishu_message_separator: ━━━━━━━━━━━━━━━━  # 飞书消息分隔符
